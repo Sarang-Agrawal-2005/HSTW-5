@@ -13,12 +13,13 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4         # ⬆️ upgraded (avoids Node.js 20 warning)
       with:
-        persist-credentials: true  # allows git-auto-commit-action to push
+        persist-credentials: true
+        fetch-depth: 0                  # full history avoids edge-case push failures
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5     # ⬆️ upgraded
       with:
         python-version: "3.10"
 
@@ -39,17 +40,22 @@ jobs:
     - name: Select Best Model
       run: python src/save_artifacts.py
 
-    - name: Wait for files to flush
-      run: sleep 2  # ensures all newly created files are fully saved
-
     - name: Push Updated Artifacts
-      uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: "Auto-update: processed data, models, and metrics"
-        file_pattern: |
-          data/processed/**
-          artifacts/**
-          models/**
-        add_options: --force
+      run: |
+        git config user.name  "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # Force-add ALL target directories (bypasses .gitignore)
+        git add --force data/processed/
+        git add --force artifacts/
+        git add --force models/
+
+        # Only commit if there's something staged
+        if git diff --cached --quiet; then
+          echo "✅ No changes to commit."
+        else
+          git commit -m "Auto-update: processed data, models, and metrics"
+          git push
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
