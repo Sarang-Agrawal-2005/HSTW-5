@@ -39,13 +39,16 @@ jobs:
     - name: Select Best Model
       run: python src/save_artifacts.py
 
+    - name: Wait for files to flush
+      run: sleep 2  # ensures all newly created files are fully saved
+
     - name: Push Updated Artifacts
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "Auto-update: processed data, models, and metrics"
         file_pattern: |
-          data/processed/*
-          artifacts/*
-          models/*
+          data/processed/**
+          artifacts/**
+          models/**
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # gives push permissions
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
