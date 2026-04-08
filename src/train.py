@@ -44,15 +44,15 @@ def main():
     y = full_df[target_col]
 
     # Train model
-    model = RandomForestClassifier(
-        n_estimators=300,
-        random_state=42,
-        class_weight="balanced"
-    )
-    model.fit(X, y)
-
-    # model = LogisticRegression(max_iter=1000)
+    # model = RandomForestClassifier(
+    #     n_estimators=300,
+    #     random_state=42,
+    #     class_weight="balanced"
+    # )
     # model.fit(X, y)
+
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X, y)
 
     ensure_dir("models")
     version = get_next_version()
