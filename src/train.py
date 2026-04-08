@@ -17,12 +17,12 @@ def get_all_processed():
 
 
 def main():
-    print("🤖 TRAINING STARTED...")
+    print("TRAINING STARTED...")
 
     processed_files = get_all_processed()
 
     if not processed_files:
-        raise FileNotFoundError("❌ No processed CSV files found in data/processed/")
+        raise FileNotFoundError("No processed CSV files found in data/processed/")
 
     print("Found processed files:")
     for f in processed_files:
@@ -36,7 +36,7 @@ def main():
 
     full_df = pd.concat(dfs, ignore_index=True)
 
-    print(f"📊 Combined dataset shape: {full_df.shape}")
+    print(f"Combined dataset shape: {full_df.shape}")
 
     # Split into X and y
     target_col = full_df.columns[-1]
@@ -44,22 +44,22 @@ def main():
     y = full_df[target_col]
 
     # Train model
-    # rf = RandomForestClassifier(
-    #     n_estimators=300,
-    #     random_state=42,
-    #     class_weight="balanced"
-    # )
-    # rf.fit(X, y)
-
-    model = LogisticRegression(max_iter=1000)
+    model = RandomForestClassifier(
+        n_estimators=300,
+        random_state=42,
+        class_weight="balanced"
+    )
     model.fit(X, y)
+
+    # model = LogisticRegression(max_iter=1000)
+    # model.fit(X, y)
 
     ensure_dir("models")
     version = get_next_version()
     model_path = f"models/model_v{version}.pkl"
     joblib.dump(model, model_path)
 
-    print(f"✔️ Model trained on ALL files and saved → {model_path}")
+    print(f"Model trained on ALL files and saved → {model_path}")
 
 
 def get_next_version():
